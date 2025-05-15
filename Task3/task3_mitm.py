@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
+import importlib.util
 import pickle
 import os
+from pathlib import Path
 from tqdm import tqdm
-from Crypto.Cipher import DES
+#from Crypto.Cipher import DES
 from task3_client import query_server
+
+# Define the path to the module
+module_path = Path(__file__).resolve().parent.parent / "Task2" / "task2_des.py"
+
+# Load the module
+spec = importlib.util.spec_from_file_location("des", module_path)
+des = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(des)
 
 # Replace with your student ID
 STUDENT_ID = "1211053"
@@ -57,18 +67,18 @@ def key_to_hex_without_parity(key_int):
 
 def des_encrypt(key_int, plain_hex):
     """Encrypt a plaintext using DES"""
-    key = key_to_bytes(key_int)
-    plaintext = hex_to_bytes(plain_hex)
-    cipher = DES.new(key, DES.MODE_ECB)
-    return bytes_to_hex(cipher.encrypt(plaintext))
+    key = bytes_to_hex(key_to_bytes(key_int))
+    plaintext = plain_hex
+    cipher = des.des_encrypt(plaintext, key)
+    return cipher
 
 
 def des_decrypt(key_int, cipher_hex):
     """Decrypt a ciphertext using DES"""
-    key = key_to_bytes(key_int)
-    ciphertext = hex_to_bytes(cipher_hex)
-    cipher = DES.new(key, DES.MODE_ECB)
-    return bytes_to_hex(cipher.decrypt(ciphertext))
+    key = bytes_to_hex(key_to_bytes(key_int))
+    ciphertext = cipher_hex
+    reconstructed_plaintext = des.des_decrypt(ciphertext, key)
+    return reconstructed_plaintext
 
 
 def generate_12bit_keys():

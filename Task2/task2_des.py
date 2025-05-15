@@ -183,8 +183,11 @@ def generate_subkeys(key):
     # Convert 56-bit key from hex to binary
     key_bin = hex_to_bin(key)
 
+    key_56 = key_bin  # if the key provided was 64 bit.
+
     # Apply PC-1 permutation to get 56-bit key
-    key_56 = key_bin   # permute(key_bin, PC1)
+    if len(key_56) == 64:
+        key_56 = permute(key_bin, PC1)
 
     # Split into left and right halves
     left = key_56[:28]
